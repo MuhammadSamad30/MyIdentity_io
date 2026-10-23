@@ -103,11 +103,12 @@ export default function Home() {
     window.print();
   }
   function addField() { setDesign((d) => ({ ...d, fields: [...d.fields, { key: `custom-${Date.now()}`, label: "New field", value: "", enabled: true }] })); }
-  const cardStyle: CSSProperties = { background: design.template === "gradient" ? `linear-gradient(135deg, ${design.accent}, #392984)` : design.bg, color: design.ink, borderRadius: `${design.radius}px`, border: `${design.border}px solid ${design.accent}`, fontFamily: design.font, transform: `scale(${zoom})`, aspectRatio: design.portrait ? "53.98 / 85.6" : "85.6 / 53.98" };
+  const cardBackground = template.style === "gradient" ? `linear-gradient(135deg, ${design.accent}, #392984)` : design.bg;
+  const cardStyle: CSSProperties = { background: cardBackground, color: design.ink, borderRadius: `${design.radius}px`, border: `${design.border}px solid ${design.accent}`, fontFamily: design.font, transform: `scale(${zoom})`, aspectRatio: design.portrait ? "53.98 / 85.6" : "85.6 / 53.98" };
 
   return <main className="studio-shell">
     <header className="topbar">
-      <a className="brand" href="#"><span className="brand-mark"><Icon name="grid" size={18} /></span><span>folio<span className="brand-light">card</span></span><span className="brand-divider"/><span className="product-label">Design studio</span></a>
+      <a className="brand" href="#"><span className="brand-mark"><Icon name="grid" size={18} /></span><span>MyIdentity<span className="brand-light">.io</span></span><span className="brand-divider"/><span className="product-label">Design studio</span></a>
       <div className="top-center"><span className="status-dot"/> All changes saved locally</div>
       <div className="top-actions"><button className="icon-btn history-btn" aria-label="Undo" title="Undo (Ctrl+Z)" onClick={undo} disabled={!canUndo}><Icon name="undo"/></button><button className="icon-btn history-btn" aria-label="Redo" title="Redo (Ctrl+Shift+Z)" onClick={redo} disabled={!canRedo}><Icon name="redo"/></button><button className="button button-quiet save-btn" onClick={saveProject}><Icon name="save"/> Save</button><button className="button button-primary" onClick={printCard}><Icon name="download"/> Export PDF</button></div>
     </header>
@@ -155,7 +156,7 @@ export default function Home() {
       </aside>
 
       <section className={`canvas-panel ${mobileView !== "Preview" ? "mobile-hide" : ""}`}>
-        <div className="canvas-toolbar"><div className="canvas-heading"><span className="eyebrow">LIVE PREVIEW</span><span className="preview-label">{design.side === "front" ? "Front side" : "Back side"}</span></div><div className="canvas-actions"><button className={`view-toggle ${design.side === "front" ? "selected" : ""}`} onClick={() => update("side", "front")}>Front</button><button className={`view-toggle ${design.side === "back" ? "selected" : ""}`} onClick={() => update("side", "back")}>Back</button><span className="toolbar-divider"/><button className="zoom-btn" aria-label="Zoom out" onClick={() => setZoom(Math.max(.55, +(zoom - .1).toFixed(2)))}><Icon name="zoomout"/></button><span className="zoom-value">{Math.round(zoom * 100)}%</span><button className="zoom-btn" aria-label="Zoom in" onClick={() => setZoom(Math.min(1.35, +(zoom + .1).toFixed(2)))}><Icon name="zoomin"/></button><button className="fit-btn" onClick={() => setZoom(1)}>Fit</button></div></div>
+        <div className="canvas-toolbar"><div className="canvas-heading"><span className="eyebrow">LIVE PREVIEW</span><span className="preview-label">{template.name} · {design.side === "front" ? "Front side" : "Back side"}</span></div><div className="canvas-actions"><button className={`view-toggle ${design.side === "front" ? "selected" : ""}`} onClick={() => update("side", "front")}>Front</button><button className={`view-toggle ${design.side === "back" ? "selected" : ""}`} onClick={() => update("side", "back")}>Back</button><span className="toolbar-divider"/><button className="zoom-btn" aria-label="Zoom out" onClick={() => setZoom(Math.max(.55, +(zoom - .1).toFixed(2)))}><Icon name="zoomout"/></button><span className="zoom-value">{Math.round(zoom * 100)}%</span><button className="zoom-btn" aria-label="Zoom in" onClick={() => setZoom(Math.min(1.35, +(zoom + .1).toFixed(2)))}><Icon name="zoomin"/></button><button className="fit-btn" onClick={() => setZoom(1)}>Fit</button></div></div>
         <div className="canvas-stage"><div className="canvas-grid"/><div className="card-wrap" style={{ width: design.portrait ? 290 : 460, maxWidth: "90%" }}>
           <div className={`id-card card-${template.style} ${design.side === "back" ? "card-back" : ""}`} style={cardStyle}>
             <CardFace design={design} template={template} isBack={design.side === "back"}/>
@@ -181,7 +182,11 @@ export default function Home() {
   </main>;
 }
 
-function MiniCard({ template: t }: { template: Template }) { return <span className={`mini-card mini-${t.style}`} style={{ background: t.style === "gradient" ? `linear-gradient(135deg,${t.accent},#392984)` : t.bg, color: t.ink, fontFamily: t.font }}><i style={{ background: t.accent }}/><b/><em/><small/><span/></span>; }
+function MiniCard({ template: t }: { template: Template }) {
+  const previewDesign = { ...defaultProject, template: t.id, accent: t.accent, bg: t.bg, ink: t.ink, font: t.font };
+  const background = t.style === "gradient" ? `linear-gradient(135deg, ${t.accent}, #392984)` : t.bg;
+  return <span className="template-mini"><span className={`id-card card-${t.style}`} style={{ width: 290, height: 182.8, aspectRatio: "auto", transform: "scale(.4)", transformOrigin: "top left", background, color: t.ink, borderRadius: 14, border: `1px solid ${t.accent}`, fontFamily: t.font }}><CardFace design={previewDesign} template={t} isBack={false}/></span></span>;
+}
 
 function CardFace({ design, template, isBack }: { design: Project; template: Template; isBack: boolean }) {
   const enabled = design.fields.filter((f) => f.enabled && f.value.trim());

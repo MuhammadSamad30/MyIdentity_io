@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "FolioCard — ID card design studio",
+  title: "MyIdentity.io | ID card design studio",
   description: "Design professional student, employee, and membership cards with live preview and print-ready export.",
 };
 
@@ -13,3 +13,4 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     </html>
   );
 }
+
